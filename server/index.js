@@ -33,13 +33,6 @@ let balances = {
   [publicKey3]: 50,
 }
 
-for (let i = 0; i < Object.values(balances).length; i++){
-  console.log("\n");
-  console.log(`Account ${i+1}: \nADDRESS: ${Object.keys(balances)[i]} \nPrivate Key:${privateKeys[i]}`);
-  console.log("\n");
-  console.log("==========================");
-}
-
 app.get('/balance/:address', (req, res) => {
   const {address} = req.params;
   const balance = balances[address] || 0;
@@ -47,12 +40,51 @@ app.get('/balance/:address', (req, res) => {
 });
 
 app.post('/send', (req, res) => {
-  const {sender, recipient, amount} = req.body;
-  balances[sender] -= amount;
-  balances[recipient] = (balances[recipient] || 0) + +amount;
-  res.send({ balance: balances[sender] });
+  const {signature, recovery, recipient, amount} = req.body;
+
+  const message = JSON.stringify({
+    to: recipient,
+    amount: parseInt(amount),
+  })
+
+  const messageHash = SHA256(message).toString();
+
+  const recoveredPublicKey = secp.recoverPublicKey(messageHash, signature, parseInt(recovery));
+
+  const isSigned = secp.verify(signature, messageHash, recoveredPublicKey);
+
+  if (isSigned){
+
+    balances[recoveredPublicKey] -= amount;
+    balances[recipient] = (balances[recipient] || 0) + +amount;
+    res.send({ balance: balances[sender] });
+    logBalances();
+  }
+  else{
+    console.error("Transaction Error: Signature does not match")
+    logBalances()
+  }
+
+  
 });
 
+function logBalances() {
+  console.log();
+  console.log("================================== ACCOUNTS ==================================");
+  console.log();
+  console.log("Public Key #1: " + publicKey1 + " has a balance of " + balances[publicKey1]);
+  console.log("Acct #1 Private Key: " + privateKey1);
+  console.log();
+  console.log("Public Key #2: " + publicKey2 + " has a balance of " + balances[publicKey2]);
+  console.log("Acct #2 Private Key: " + privateKey2);
+  console.log();
+  console.log("Public Key #3: " + publicKey3 + " has a balance of " + balances[publicKey3]);
+  console.log("Acct #3 Private Key: " + privateKey3);
+  console.log();
+  console.log("==============================================================================");
+}
+
 app.listen(port, () => {
+  logBalances()
   console.log(`Listening on port ${port}!`);
 });

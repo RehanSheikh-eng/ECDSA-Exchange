@@ -16,12 +16,13 @@ document.getElementById("exchange-address").addEventListener('input', ({ target:
 });
 
 document.getElementById("transfer-amount").addEventListener('click', () => {
-  const sender = document.getElementById("exchange-address").value;
   const amount = document.getElementById("send-amount").value;
   const recipient = document.getElementById("recipient").value;
+  const signature = document.getElementById("signature").value;
+  const recovery = document.getElementById("recovery").value;
 
   const body = JSON.stringify({
-    sender, amount, recipient
+    signature, recovery, recipient, amount
   });
 
   const request = new Request(`${server}/send`, { method: 'POST', body });
