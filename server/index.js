@@ -28,13 +28,16 @@ const publicKey2 = secp.getPublicKey(privateKey2);
 const publicKey3 = secp.getPublicKey(privateKey3);
 
 let balances = {
-  publicKey1: 100,
-  publicKey2: 75,
-  publicKey3: 50,
+  [publicKey1]: 100,
+  [publicKey2]: 75,
+  [publicKey3]: 50,
 }
 
-for (let i = 0; i < Object.keys(balances).length; i++){
-  console.log(`Account ${i}: \nADDRESS: ${Object.keys(balances)[i]} \nPrivate Key:${privateKeys[i]}`);
+for (let i = 0; i < Object.values(balances).length; i++){
+  console.log("\n");
+  console.log(`Account ${i+1}: \nADDRESS: ${Object.keys(balances)[i]} \nPrivate Key:${privateKeys[i]}`);
+  console.log("\n");
+  console.log("==========================");
 }
 
 app.get('/balance/:address', (req, res) => {
