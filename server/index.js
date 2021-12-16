@@ -20,6 +20,23 @@ privateKey1 = Buffer.from(privateKey1).toString('hex');
 privateKey2 = Buffer.from(privateKey2).toString('hex');
 privateKey3 = Buffer.from(privateKey3).toString('hex');
 
+const privateKeys = [privateKey1, privateKey2, privateKey3];
+
+// Get public key from private key
+const publicKey1 = secp.getPublicKey(privateKey1);
+const publicKey2 = secp.getPublicKey(privateKey2);
+const publicKey3 = secp.getPublicKey(privateKey3);
+
+let balances = {
+  publicKey1: 100,
+  publicKey2: 75,
+  publicKey3: 50,
+}
+
+for (let i = 0; i < Object.keys(balances).length; i++){
+  console.log(`Account ${i}: \nADDRESS: ${Object.keys(balances)[i]} \nPrivate Key:${privateKeys[i]}`);
+}
+
 app.get('/balance/:address', (req, res) => {
   const {address} = req.params;
   const balance = balances[address] || 0;
